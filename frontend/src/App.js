@@ -31,18 +31,18 @@ const getCryptoLogoUrl = (symbol) => {
 const CryptoCard = ({ crypto, recommendation, onAnalyzeClick, isAnalyzing }) => {
   const getRecommendationColor = (rec) => {
     switch (rec?.toUpperCase()) {
-      case 'BUY': return 'text-green-600 bg-green-50 border-green-200';
-      case 'SELL': return 'text-red-600 bg-red-50 border-red-200';
-      case 'HOLD': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'BUY': return 'text-black bg-white border-black';
+      case 'SELL': return 'text-white bg-black border-black';
+      case 'HOLD': return 'text-gray-600 bg-gray-100 border-gray-400';
       default: return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
   const getConfidenceColor = (confidence) => {
     switch (confidence?.toUpperCase()) {
-      case 'HIGH': return 'text-green-700 bg-green-100';
-      case 'MEDIUM': return 'text-yellow-700 bg-yellow-100';
-      case 'LOW': return 'text-red-700 bg-red-100';
+      case 'HIGH': return 'text-black bg-gray-200';
+      case 'MEDIUM': return 'text-gray-700 bg-gray-100';
+      case 'LOW': return 'text-gray-500 bg-gray-50';
       default: return 'text-gray-700 bg-gray-100';
     }
   };
@@ -58,46 +58,46 @@ const CryptoCard = ({ crypto, recommendation, onAnalyzeClick, isAnalyzing }) => 
   const logoUrl = getCryptoLogoUrl(crypto.symbol);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+    <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-gray-200 hover:border-black hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <img 
             src={logoUrl} 
             alt={`${crypto.symbol} logo`}
-            className="w-10 h-10 rounded-full object-cover bg-gray-100 p-1"
+            className="w-10 h-10 rounded-full object-cover bg-gray-100 p-1 border border-gray-300"
             onError={(e) => {
               e.target.src = `https://via.placeholder.com/40/cccccc/000000?text=${crypto.symbol}`;
             }}
           />
           <div>
-            <h3 className="text-xl font-bold text-gray-800">{crypto.symbol}</h3>
-            <p className="text-sm text-gray-500">{crypto.name}</p>
+            <h3 className="text-xl font-bold text-black">{crypto.symbol}</h3>
+            <p className="text-sm text-gray-600">{crypto.name}</p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-bold text-gray-900">{formatPrice(crypto.price)}</p>
-          <p className={`text-sm font-medium ${crypto.percent_change_24h >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className="text-2xl font-bold text-black">{formatPrice(crypto.price)}</p>
+          <p className={`text-sm font-medium ${crypto.percent_change_24h >= 0 ? 'text-black' : 'text-gray-600'}`}>
             {crypto.percent_change_24h >= 0 ? '+' : ''}{crypto.percent_change_24h.toFixed(2)}%
           </p>
         </div>
       </div>
       
       <div className="space-y-3">
-        <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
           <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
             <div>
-              <span className="font-medium">Market Cap:</span>
-              <p>${(crypto.market_cap / 1000000000).toFixed(1)}B</p>
+              <span className="font-medium text-black">Market Cap:</span>
+              <p className="text-gray-800">${(crypto.market_cap / 1000000000).toFixed(1)}B</p>
             </div>
             <div>
-              <span className="font-medium">24h Volume:</span>
-              <p>${(crypto.volume_24h / 1000000).toFixed(1)}M</p>
+              <span className="font-medium text-black">24h Volume:</span>
+              <p className="text-gray-800">${(crypto.volume_24h / 1000000).toFixed(1)}M</p>
             </div>
           </div>
         </div>
 
         {recommendation ? (
-          <div className={`p-3 rounded-lg border ${getRecommendationColor(recommendation.recommendation)}`}>
+          <div className={`p-3 rounded-lg border-2 ${getRecommendationColor(recommendation.recommendation)}`}>
             <div className="flex items-center justify-between mb-2">
               <span className="font-semibold">AI Recommendation</span>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${getConfidenceColor(recommendation.confidence)}`}>
@@ -113,8 +113,8 @@ const CryptoCard = ({ crypto, recommendation, onAnalyzeClick, isAnalyzing }) => 
                 {formatPrice(recommendation.price_target)}
               </div>
             )}
-            <div className="bg-white bg-opacity-50 p-2 rounded text-xs">
-              <p className="text-gray-700 leading-relaxed">
+            <div className="bg-gray-100 p-2 rounded text-xs border border-gray-300">
+              <p className="text-gray-800 leading-relaxed">
                 {recommendation.reasoning}
               </p>
             </div>
@@ -126,7 +126,7 @@ const CryptoCard = ({ crypto, recommendation, onAnalyzeClick, isAnalyzing }) => 
           <button
             onClick={() => onAnalyzeClick(crypto.symbol)}
             disabled={isAnalyzing}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+            className="w-full bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 border border-black"
           >
             {isAnalyzing ? (
               <>

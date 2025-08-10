@@ -5,9 +5,32 @@ import axios from "axios";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const CryptoCard = ({ analysis }) => {
-  const getRecommendationColor = (recommendation) => {
-    switch (recommendation?.toUpperCase()) {
+// Cryptocurrency logo mapping using CoinGecko's API
+const getCryptoLogoUrl = (symbol) => {
+  const logoMap = {
+    'BTC': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+    'ETH': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+    'XRP': 'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png',
+    'BNB': 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png',
+    'SOL': 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
+    'DOGE': 'https://assets.coingecko.com/coins/images/5/large/dogecoin.png',
+    'TRX': 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png',
+    'ADA': 'https://assets.coingecko.com/coins/images/975/large/cardano.png',
+    'HYPE': 'https://assets.coingecko.com/coins/images/37633/large/token.png',
+    'LINK': 'https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png',
+    'XLM': 'https://assets.coingecko.com/coins/images/100/large/Stellar_symbol_black_RGB.png',
+    'BCH': 'https://assets.coingecko.com/coins/images/780/large/bitcoin-cash-circle.png',
+    'HBAR': 'https://assets.coingecko.com/coins/images/3441/large/Hedera_Hashgraph_Logo.png',
+    'AVAX': 'https://assets.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png',
+    'LTC': 'https://assets.coingecko.com/coins/images/2/large/litecoin.png'
+  };
+  
+  return logoMap[symbol] || `https://via.placeholder.com/32/cccccc/000000?text=${symbol}`;
+};
+
+const CryptoCard = ({ crypto, recommendation, onAnalyzeClick, isAnalyzing }) => {
+  const getRecommendationColor = (rec) => {
+    switch (rec?.toUpperCase()) {
       case 'BUY': return 'text-green-600 bg-green-50 border-green-200';
       case 'SELL': return 'text-red-600 bg-red-50 border-red-200';
       case 'HOLD': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
@@ -32,50 +55,93 @@ const CryptoCard = ({ analysis }) => {
     }
   };
 
+  const logoUrl = getCryptoLogoUrl(crypto.symbol);
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-xl font-bold text-gray-800">{analysis.symbol}</h3>
-          <p className="text-sm text-gray-500">Current Price</p>
+        <div className="flex items-center space-x-3">
+          <img 
+            src={logoUrl} 
+            alt={`${crypto.symbol} logo`}
+            className="w-10 h-10 rounded-full object-cover bg-gray-100 p-1"
+            onError={(e) => {
+              e.target.src = `https://via.placeholder.com/40/cccccc/000000?text=${crypto.symbol}`;
+            }}
+          />
+          <div>
+            <h3 className="text-xl font-bold text-gray-800">{crypto.symbol}</h3>
+            <p className="text-sm text-gray-500">{crypto.name}</p>
+          </div>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-bold text-gray-900">{formatPrice(analysis.current_price)}</p>
-          <p className={`text-sm font-medium ${analysis.price_change_24h >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {analysis.price_change_24h >= 0 ? '+' : ''}{analysis.price_change_24h.toFixed(2)}%
+          <p className="text-2xl font-bold text-gray-900">{formatPrice(crypto.price)}</p>
+          <p className={`text-sm font-medium ${crypto.percent_change_24h >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {crypto.percent_change_24h >= 0 ? '+' : ''}{crypto.percent_change_24h.toFixed(2)}%
           </p>
         </div>
       </div>
       
       <div className="space-y-3">
-        <div className={`p-3 rounded-lg border ${getRecommendationColor(analysis.recommendation?.recommendation)}`}>
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-semibold">AI Recommendation</span>
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getConfidenceColor(analysis.recommendation?.confidence)}`}>
-              {analysis.recommendation?.confidence} Confidence
-            </span>
-          </div>
-          <div className="text-lg font-bold mb-2">
-            {analysis.recommendation?.recommendation}
-          </div>
-          {analysis.recommendation?.price_target && (
-            <div className="text-sm">
-              <span className="font-medium">7-day Target: </span>
-              {formatPrice(analysis.recommendation.price_target)}
-            </div>
-          )}
-        </div>
-        
         <div className="bg-gray-50 p-3 rounded-lg">
-          <p className="text-sm font-medium text-gray-700 mb-1">Analysis</p>
-          <p className="text-sm text-gray-600 leading-relaxed">
-            {analysis.recommendation?.reasoning}
-          </p>
+          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+            <div>
+              <span className="font-medium">Market Cap:</span>
+              <p>${(crypto.market_cap / 1000000000).toFixed(1)}B</p>
+            </div>
+            <div>
+              <span className="font-medium">24h Volume:</span>
+              <p>${(crypto.volume_24h / 1000000).toFixed(1)}M</p>
+            </div>
+          </div>
         </div>
-      </div>
-      
-      <div className="mt-4 text-xs text-gray-400 text-center">
-        Last updated: {new Date(analysis.recommendation?.created_at).toLocaleString()}
+
+        {recommendation ? (
+          <div className={`p-3 rounded-lg border ${getRecommendationColor(recommendation.recommendation)}`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-semibold">AI Recommendation</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getConfidenceColor(recommendation.confidence)}`}>
+                {recommendation.confidence} Confidence
+              </span>
+            </div>
+            <div className="text-lg font-bold mb-2">
+              {recommendation.recommendation}
+            </div>
+            {recommendation.price_target && (
+              <div className="text-sm mb-2">
+                <span className="font-medium">7-day Target: </span>
+                {formatPrice(recommendation.price_target)}
+              </div>
+            )}
+            <div className="bg-white bg-opacity-50 p-2 rounded text-xs">
+              <p className="text-gray-700 leading-relaxed">
+                {recommendation.reasoning}
+              </p>
+            </div>
+            <div className="mt-2 text-xs text-gray-500">
+              Generated: {new Date(recommendation.created_at).toLocaleString()}
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => onAnalyzeClick(crypto.symbol)}
+            disabled={isAnalyzing}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+          >
+            {isAnalyzing ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Generating AI Analysis...
+              </>
+            ) : (
+              <>
+                🤖 Get AI Investment Analysis
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -84,9 +150,12 @@ const CryptoCard = ({ analysis }) => {
 const LoadingCard = () => (
   <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-100 animate-pulse">
     <div className="flex items-center justify-between mb-4">
-      <div>
-        <div className="h-5 bg-gray-300 rounded w-12 mb-2"></div>
-        <div className="h-3 bg-gray-200 rounded w-20"></div>
+      <div className="flex items-center space-x-3">
+        <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+        <div>
+          <div className="h-5 bg-gray-300 rounded w-12 mb-2"></div>
+          <div className="h-3 bg-gray-200 rounded w-20"></div>
+        </div>
       </div>
       <div className="text-right">
         <div className="h-7 bg-gray-300 rounded w-20 mb-1"></div>
@@ -94,44 +163,63 @@ const LoadingCard = () => (
       </div>
     </div>
     <div className="space-y-3">
-      <div className="p-3 rounded-lg bg-gray-100">
-        <div className="h-4 bg-gray-300 rounded w-32 mb-2"></div>
-        <div className="h-6 bg-gray-300 rounded w-16"></div>
-      </div>
       <div className="bg-gray-50 p-3 rounded-lg">
         <div className="h-3 bg-gray-300 rounded w-full mb-2"></div>
-        <div className="h-3 bg-gray-200 rounded w-4/5"></div>
+        <div className="h-3 bg-gray-200 rounded w-3/4"></div>
       </div>
+      <div className="h-10 bg-gray-200 rounded w-full"></div>
     </div>
   </div>
 );
 
 const Home = () => {
-  const [marketAnalysis, setMarketAnalysis] = useState([]);
+  const [cryptoPrices, setCryptoPrices] = useState([]);
+  const [recommendations, setRecommendations] = useState({});
   const [loading, setLoading] = useState(true);
+  const [analyzingSymbols, setAnalyzingSymbols] = useState(new Set());
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
 
-  const fetchMarketAnalysis = async () => {
+  const fetchCryptoPrices = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${API}/crypto/analysis`);
-      setMarketAnalysis(response.data);
+      const response = await axios.get(`${API}/crypto/prices`);
+      setCryptoPrices(response.data);
       setLastUpdate(new Date());
     } catch (e) {
-      console.error('Error fetching market analysis:', e);
-      setError('Failed to fetch market analysis. Please try again later.');
+      console.error('Error fetching crypto prices:', e);
+      setError('Failed to fetch cryptocurrency prices. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
+  const generateAIAnalysis = async (symbol) => {
+    try {
+      setAnalyzingSymbols(prev => new Set([...prev, symbol]));
+      const response = await axios.get(`${API}/crypto/${symbol}/recommendation`);
+      setRecommendations(prev => ({
+        ...prev,
+        [symbol]: response.data
+      }));
+    } catch (e) {
+      console.error(`Error generating AI analysis for ${symbol}:`, e);
+      setError(`Failed to generate AI analysis for ${symbol}. Please try again.`);
+    } finally {
+      setAnalyzingSymbols(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(symbol);
+        return newSet;
+      });
+    }
+  };
+
   useEffect(() => {
-    fetchMarketAnalysis();
+    fetchCryptoPrices();
     
-    // Set up auto-refresh every 5 minutes
-    const interval = setInterval(fetchMarketAnalysis, 5 * 60 * 1000);
+    // Set up auto-refresh every 5 minutes for prices only
+    const interval = setInterval(fetchCryptoPrices, 5 * 60 * 1000);
     
     return () => clearInterval(interval);
   }, []);
@@ -144,23 +232,23 @@ const Home = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Crypto Investment AI</h1>
-              <p className="text-gray-600 mt-1">AI-powered cryptocurrency investment recommendations</p>
+              <p className="text-gray-600 mt-1">Real-time cryptocurrency prices with on-demand AI investment analysis</p>
             </div>
             <button
-              onClick={fetchMarketAnalysis}
+              onClick={fetchCryptoPrices}
               disabled={loading}
               className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
             >
               <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              {loading ? 'Updating...' : 'Refresh'}
+              {loading ? 'Updating Prices...' : 'Refresh Prices'}
             </button>
           </div>
           
           {lastUpdate && (
             <p className="text-sm text-gray-500 mt-2">
-              Last updated: {lastUpdate.toLocaleString()}
+              Prices last updated: {lastUpdate.toLocaleString()}
             </p>
           )}
         </div>
@@ -179,6 +267,21 @@ const Home = () => {
               <p className="text-sm text-yellow-700 mt-1">
                 These AI recommendations are for informational purposes only and should not be considered as financial advice. 
                 Cryptocurrency investments are highly volatile and risky. Always do your own research and consult with financial advisors.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Usage Instructions */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+          <div className="flex items-start">
+            <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h3 className="text-sm font-medium text-blue-800">How it works</h3>
+              <p className="text-sm text-blue-700 mt-1">
+                Click the "Get AI Investment Analysis" button below any cryptocurrency to receive personalized BUY/HOLD/SELL recommendations powered by OpenAI GPT-4.
               </p>
             </div>
           </div>
@@ -206,19 +309,25 @@ const Home = () => {
               <LoadingCard key={index} />
             ))
           ) : (
-            marketAnalysis.map((analysis) => (
-              <CryptoCard key={analysis.symbol} analysis={analysis} />
+            cryptoPrices.map((crypto) => (
+              <CryptoCard 
+                key={crypto.symbol} 
+                crypto={crypto}
+                recommendation={recommendations[crypto.symbol]}
+                onAnalyzeClick={generateAIAnalysis}
+                isAnalyzing={analyzingSymbols.has(crypto.symbol)}
+              />
             ))
           )}
         </div>
 
-        {marketAnalysis.length === 0 && !loading && !error && (
+        {cryptoPrices.length === 0 && !loading && !error && (
           <div className="text-center py-12">
             <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No data available</h3>
-            <p className="text-gray-500">Click refresh to load cryptocurrency analysis</p>
+            <p className="text-gray-500">Click refresh to load cryptocurrency prices</p>
           </div>
         )}
       </main>

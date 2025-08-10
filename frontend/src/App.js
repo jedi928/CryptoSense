@@ -148,10 +148,10 @@ const CryptoCard = ({ crypto, recommendation, onAnalyzeClick, isAnalyzing }) => 
 };
 
 const LoadingCard = () => (
-  <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-100 animate-pulse">
+  <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-gray-200 animate-pulse">
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+        <div className="w-10 h-10 bg-gray-300 rounded-full border border-gray-300"></div>
         <div>
           <div className="h-5 bg-gray-300 rounded w-12 mb-2"></div>
           <div className="h-3 bg-gray-200 rounded w-20"></div>
@@ -163,11 +163,11 @@ const LoadingCard = () => (
       </div>
     </div>
     <div className="space-y-3">
-      <div className="bg-gray-50 p-3 rounded-lg">
+      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
         <div className="h-3 bg-gray-300 rounded w-full mb-2"></div>
         <div className="h-3 bg-gray-200 rounded w-3/4"></div>
       </div>
-      <div className="h-10 bg-gray-200 rounded w-full"></div>
+      <div className="h-10 bg-gray-300 rounded w-full border border-gray-400"></div>
     </div>
   </div>
 );

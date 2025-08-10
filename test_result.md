@@ -148,7 +148,7 @@ backend:
         comment: "Implemented Pydantic models for CryptoPrice, AIRecommendation, and MarketAnalysis. Added MongoDB storage for recommendation history with /crypto/recommendations/history endpoint"
       - working: true
         agent: "testing"
-        comment: "TESTED SUCCESSFULLY: Database models and storage working perfectly. GET /api/crypto/recommendations/history returns historical recommendations with proper data structure. MongoDB is successfully storing AI recommendations with all required fields (id, symbol, recommendation, confidence, reasoning, price_target, created_at). Retrieved 65+ historical recommendations during testing."
+        comment: "✅ PASS - Successfully retrieved 65+ historical recommendations from MongoDB. Database storage and models working correctly."
 
   - task: "API Endpoints for Crypto Data"
     implemented: true

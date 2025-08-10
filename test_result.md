@@ -220,9 +220,10 @@ metadata:
 test_plan:
   current_focus:
     - "Crypto Dashboard UI"
-    - "Responsive Design and Styling"
     - "Real-time Price Display"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Crypto Dashboard UI"
+    - "Real-time Price Display"
   test_all: false
   test_priority: "high_first"
 

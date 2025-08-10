@@ -225,19 +225,19 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
+      <header className="bg-black shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Crypto Investment AI</h1>
-              <p className="text-gray-600 mt-1">Real-time cryptocurrency prices with on-demand AI investment analysis</p>
+              <h1 className="text-3xl font-bold text-white">CoinSense</h1>
+              <p className="text-gray-300 mt-1">Real-time cryptocurrency prices with on-demand AI investment analysis</p>
             </div>
             <button
               onClick={fetchCryptoPrices}
               disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+              className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 border border-gray-300"
             >
               <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -247,7 +247,7 @@ const Home = () => {
           </div>
           
           {lastUpdate && (
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-400 mt-2">
               Prices last updated: {lastUpdate.toLocaleString()}
             </p>
           )}
@@ -257,14 +257,14 @@ const Home = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Disclaimer */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+        <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 mb-8">
           <div className="flex items-start">
-            <svg className="w-5 h-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
             <div>
-              <h3 className="text-sm font-medium text-yellow-800">Investment Disclaimer</h3>
-              <p className="text-sm text-yellow-700 mt-1">
+              <h3 className="text-sm font-medium text-gray-900">Investment Disclaimer</h3>
+              <p className="text-sm text-gray-700 mt-1">
                 These AI recommendations are for informational purposes only and should not be considered as financial advice. 
                 Cryptocurrency investments are highly volatile and risky. Always do your own research and consult with financial advisors.
               </p>
@@ -273,14 +273,14 @@ const Home = () => {
         </div>
 
         {/* Usage Instructions */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+        <div className="bg-black border border-gray-300 rounded-lg p-4 mb-8">
           <div className="flex items-start">
-            <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-white mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <h3 className="text-sm font-medium text-blue-800">How it works</h3>
-              <p className="text-sm text-blue-700 mt-1">
+              <h3 className="text-sm font-medium text-white">How it works</h3>
+              <p className="text-sm text-gray-300 mt-1">
                 Click the "Get AI Investment Analysis" button below any cryptocurrency to receive personalized BUY/HOLD/SELL recommendations powered by OpenAI GPT-4.
               </p>
             </div>
@@ -288,14 +288,14 @@ const Home = () => {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+          <div className="bg-gray-100 border border-gray-400 rounded-lg p-4 mb-8">
             <div className="flex items-start">
-              <svg className="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-800 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                <p className="text-sm text-red-700 mt-1">{error}</p>
+                <h3 className="text-sm font-medium text-gray-900">Error</h3>
+                <p className="text-sm text-gray-700 mt-1">{error}</p>
               </div>
             </div>
           </div>
@@ -333,11 +333,11 @@ const Home = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 mt-16">
+      <footer className="bg-black border-t border-gray-300 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-sm text-gray-500">
+          <div className="text-center text-sm text-gray-400">
             <p>Powered by CoinMarketCap API and OpenAI GPT-4</p>
-            <p className="mt-1">© 2025 Crypto Investment AI. For educational purposes only.</p>
+            <p className="mt-1">© 2025 CoinSense. For educational purposes only.</p>
           </div>
         </div>
       </footer>

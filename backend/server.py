@@ -332,6 +332,25 @@ async def get_crypto_recommendation(symbol: str):
         logger.error(f"Error getting recommendation for {symbol}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to generate recommendation")
 
+@api_router.get("/crypto/{symbol}/history")
+async def get_crypto_history(symbol: str, days: int = 7):
+    """Get historical price data for a specific cryptocurrency"""
+    symbol = symbol.upper()
+    if symbol not in TARGET_CRYPTOS:
+        raise HTTPException(status_code=404, detail=f"Cryptocurrency {symbol} not supported")
+    
+    try:
+        historical_data = await fetch_historical_prices(symbol, days)
+        return {
+            "symbol": symbol,
+            "days": days,
+            "data": historical_data
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching historical data for {symbol}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch historical data")
+
 @api_router.get("/crypto/recommendations/history", response_model=List[AIRecommendation])
 async def get_recommendation_history(limit: int = 100):
     """Get historical AI recommendations"""

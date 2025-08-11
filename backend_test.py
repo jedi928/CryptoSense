@@ -310,6 +310,112 @@ class CryptoAPITester:
         print("✅ Individual recommendation tests passed")
         return True
 
+    async def test_historical_data(self):
+        """Test historical chart data endpoints"""
+        print("🔍 Testing Historical Chart Data...")
+        test_symbols = ['BTC', 'ETH']  # Test with Bitcoin and Ethereum
+        
+        for symbol in test_symbols:
+            print(f"  Testing {symbol} historical data...")
+            try:
+                async with self.session.get(f"{BACKEND_URL}/crypto/{symbol}/history") as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        
+                        # Validate response structure
+                        required_fields = ['symbol', 'days', 'data']
+                        for field in required_fields:
+                            if field not in data:
+                                self.test_results['historical_data'] = {
+                                    'status': 'fail',
+                                    'details': f"Missing required field '{field}' in {symbol} historical data"
+                                }
+                                print(f"❌ {symbol} historical data test failed - missing field '{field}'")
+                                return False
+                        
+                        # Validate symbol matches
+                        if data['symbol'] != symbol:
+                            self.test_results['historical_data'] = {
+                                'status': 'fail',
+                                'details': f"Symbol mismatch: expected {symbol}, got {data['symbol']}"
+                            }
+                            print(f"❌ {symbol} historical data test failed - symbol mismatch")
+                            return False
+                        
+                        # Validate days (should be 7 by default)
+                        if data['days'] != 7:
+                            self.test_results['historical_data'] = {
+                                'status': 'fail',
+                                'details': f"Expected 7 days of data, got {data['days']}"
+                            }
+                            print(f"❌ {symbol} historical data test failed - incorrect days")
+                            return False
+                        
+                        # Validate historical data array
+                        historical_data = data['data']
+                        if not isinstance(historical_data, list):
+                            self.test_results['historical_data'] = {
+                                'status': 'fail',
+                                'details': f"Expected list for historical data, got {type(historical_data)}"
+                            }
+                            print(f"❌ {symbol} historical data test failed - data is not a list")
+                            return False
+                        
+                        if len(historical_data) == 0:
+                            self.test_results['historical_data'] = {
+                                'status': 'fail',
+                                'details': f"No historical data returned for {symbol}"
+                            }
+                            print(f"❌ {symbol} historical data test failed - no data returned")
+                            return False
+                        
+                        # Validate data point structure
+                        for i, point in enumerate(historical_data[:5]):  # Check first 5 points
+                            required_point_fields = ['timestamp', 'date', 'price']
+                            for field in required_point_fields:
+                                if field not in point:
+                                    self.test_results['historical_data'] = {
+                                        'status': 'fail',
+                                        'details': f"Missing field '{field}' in {symbol} historical data point {i}"
+                                    }
+                                    print(f"❌ {symbol} historical data test failed - missing field '{field}' in data point")
+                                    return False
+                            
+                            # Validate price is a number
+                            if not isinstance(point['price'], (int, float)):
+                                self.test_results['historical_data'] = {
+                                    'status': 'fail',
+                                    'details': f"Invalid price type in {symbol} historical data: {type(point['price'])}"
+                                }
+                                print(f"❌ {symbol} historical data test failed - invalid price type")
+                                return False
+                        
+                        print(f"  ✅ {symbol}: {len(historical_data)} data points retrieved")
+                        
+                    else:
+                        error_text = await response.text()
+                        self.test_results['historical_data'] = {
+                            'status': 'fail',
+                            'details': f"HTTP {response.status} for {symbol}: {error_text}"
+                        }
+                        print(f"❌ {symbol} historical data test failed - HTTP {response.status}")
+                        return False
+                        
+            except Exception as e:
+                self.test_results['historical_data'] = {
+                    'status': 'fail',
+                    'details': f"Exception for {symbol}: {str(e)}"
+                }
+                print(f"❌ {symbol} historical data test failed - Exception: {str(e)}")
+                return False
+        
+        self.test_results['historical_data'] = {
+            'status': 'pass',
+            'details': f"Successfully tested historical data for {test_symbols}"
+        }
+        print("✅ Historical chart data tests passed")
+        return True
+
     async def test_recommendation_history(self):
         """Test recommendation history endpoint"""
         print("🔍 Testing Recommendation History...")

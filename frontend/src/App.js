@@ -169,8 +169,8 @@ const CryptoCard = ({ crypto, recommendation, onAnalyzeClick, isAnalyzing }) => 
       {/* Price Chart */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-gray-600">1-Hour Price Trend</span>
-          <span className="text-xs text-gray-500">Live</span>
+          <span className="text-xs font-medium text-gray-600">7-Day Price Trend</span>
+          <span className="text-xs text-gray-500">Hourly</span>
         </div>
         <PriceChart symbol={crypto.symbol} currentPrice={crypto.price} />
       </div>

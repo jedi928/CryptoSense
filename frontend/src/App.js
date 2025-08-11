@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -26,6 +27,88 @@ const getCryptoLogoUrl = (symbol) => {
   };
   
   return logoMap[symbol] || `https://via.placeholder.com/32/cccccc/000000?text=${symbol}`;
+};
+
+const PriceChart = ({ symbol, currentPrice }) => {
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API}/crypto/${symbol}/history?days=7`);
+        const data = response.data.data;
+        
+        // Format data for recharts
+        const formattedData = data.map((point, index) => ({
+          time: new Date(point.date).toLocaleDateString(),
+          price: point.price,
+          index: index
+        }));
+        
+        setChartData(formattedData);
+      } catch (e) {
+        console.error(`Error fetching chart data for ${symbol}:`, e);
+        setError('Chart data unavailable');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChartData();
+  }, [symbol]);
+
+  if (loading) {
+    return (
+      <div className="h-24 bg-gray-50 rounded flex items-center justify-center">
+        <div className="text-xs text-gray-500">Loading chart...</div>
+      </div>
+    );
+  }
+
+  if (error || chartData.length === 0) {
+    return (
+      <div className="h-24 bg-gray-50 rounded flex items-center justify-center">
+        <div className="text-xs text-gray-500">Chart unavailable</div>
+      </div>
+    );
+  }
+
+  // Determine line color based on price trend
+  const firstPrice = chartData[0]?.price || currentPrice;
+  const lastPrice = chartData[chartData.length - 1]?.price || currentPrice;
+  const lineColor = lastPrice >= firstPrice ? '#000000' : '#666666';
+
+  return (
+    <div className="h-24 bg-gray-50 rounded p-2">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData}>
+          <XAxis hide />
+          <YAxis hide />
+          <Tooltip 
+            labelStyle={{ color: '#000' }}
+            contentStyle={{ 
+              backgroundColor: 'white', 
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              fontSize: '12px'
+            }}
+            formatter={(value) => [`$${value.toFixed(4)}`, 'Price']}
+          />
+          <Line 
+            type="monotone" 
+            dataKey="price" 
+            stroke={lineColor}
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 3, fill: lineColor }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
 };
 
 const CryptoCard = ({ crypto, recommendation, onAnalyzeClick, isAnalyzing }) => {

@@ -149,18 +149,21 @@ async def fetch_historical_prices(symbol: str, days: int = 7) -> List[Dict]:
     except:
         base_price = 1000
     
-    # Generate realistic mock historical data
+    # Generate realistic mock historical data for 1 hour (minute-by-minute data)
     import random
     historical_data = []
     
-    for i in range(days * 24):  # Hourly data for the specified days
-        # Create price variation around the base price (-10% to +10%)
-        price_variation = random.uniform(-0.1, 0.1)
-        # Add some trending behavior
-        trend_factor = (i / (days * 24)) * random.uniform(-0.05, 0.05)
+    # For 1 hour, generate 60 data points (1 per minute)
+    minutes = 60
+    
+    for i in range(minutes):
+        # Create smaller price variation for minute-by-minute data (-0.5% to +0.5%)
+        price_variation = random.uniform(-0.005, 0.005)
+        # Add some micro-trending behavior
+        trend_factor = (i / minutes) * random.uniform(-0.002, 0.002)
         
         mock_price = base_price * (1 + price_variation + trend_factor)
-        timestamp = (datetime.utcnow() - timedelta(hours=(days * 24 - i))).timestamp() * 1000
+        timestamp = (datetime.utcnow() - timedelta(minutes=(minutes - i))).timestamp() * 1000
         
         historical_data.append({
             'timestamp': int(timestamp),

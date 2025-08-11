@@ -157,12 +157,17 @@ async def fetch_historical_prices(symbol: str, days: int = 7) -> List[Dict]:
     minutes = 60
     
     for i in range(minutes):
-        # Create smaller price variation for minute-by-minute data (-0.5% to +0.5%)
-        price_variation = random.uniform(-0.005, 0.005)
-        # Add some micro-trending behavior
-        trend_factor = (i / minutes) * random.uniform(-0.002, 0.002)
+        # Create more significant price variation for interesting charts (-2% to +2%)
+        price_variation = random.uniform(-0.02, 0.02)
+        # Add trending behavior that can create meaningful price movements
+        trend_factor = (i / minutes) * random.uniform(-0.015, 0.015)
+        # Add some volatility spikes occasionally
+        if random.random() < 0.1:  # 10% chance of volatility spike
+            volatility_spike = random.uniform(-0.03, 0.03)
+        else:
+            volatility_spike = 0
         
-        mock_price = base_price * (1 + price_variation + trend_factor)
+        mock_price = base_price * (1 + price_variation + trend_factor + volatility_spike)
         timestamp = (datetime.utcnow() - timedelta(minutes=(minutes - i))).timestamp() * 1000
         
         historical_data.append({

@@ -42,11 +42,28 @@ const PriceChart = ({ symbol, currentPrice }) => {
         const data = response.data.data;
         
         // Format data for recharts (show every 6 hours for cleaner display)
-        const formattedData = data.filter((_, index) => index % 6 === 0).map((point, index) => ({
-          time: new Date(point.date).toLocaleDateString([], { month: 'short', day: 'numeric' }),
-          price: point.price,
-          index: index
-        }));
+        const formattedData = data.filter((_, index) => index % 6 === 0).map((point, index) => {
+          const date = new Date(point.date);
+          const formattedDate = date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            hour12: false
+          });
+          
+          return {
+            time: formattedDate,
+            price: point.price,
+            fullDate: date.toLocaleDateString('en-US', { 
+              weekday: 'short',
+              month: 'short', 
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            index: index
+          };
+        });
         
         setChartData(formattedData);
       } catch (e) {
@@ -88,15 +105,21 @@ const PriceChart = ({ symbol, currentPrice }) => {
           <XAxis hide />
           <YAxis hide />
           <Tooltip 
-            labelStyle={{ color: '#000' }}
+            labelStyle={{ color: '#000', fontWeight: 'bold' }}
             contentStyle={{ 
               backgroundColor: 'white', 
               border: '1px solid #ccc',
               borderRadius: '4px',
-              fontSize: '12px'
+              fontSize: '12px',
+              padding: '8px'
             }}
-            formatter={(value) => [`$${value.toFixed(4)}`, 'Price']}
-            labelFormatter={(label) => `Date: ${label}`}
+            formatter={(value, name, props) => [`$${value.toFixed(2)}`, 'Price']}
+            labelFormatter={(label, payload) => {
+              if (payload && payload[0]) {
+                return payload[0].payload.fullDate;
+              }
+              return label;
+            }}
           />
           <Line 
             type="monotone" 

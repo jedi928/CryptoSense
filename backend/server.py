@@ -136,6 +136,58 @@ async def fetch_crypto_prices() -> List[CryptoPrice]:
             
             return crypto_prices
 
+async def fetch_historical_prices(symbol: str, days: int = 7) -> List[Dict]:
+    """Fetch historical price data from CoinGecko API"""
+    # Map symbols to CoinGecko IDs
+    coingecko_id_map = {
+        'BTC': 'bitcoin',
+        'ETH': 'ethereum', 
+        'XRP': 'ripple',
+        'BNB': 'binancecoin',
+        'SOL': 'solana',
+        'DOGE': 'dogecoin',
+        'TRX': 'tron',
+        'ADA': 'cardano',
+        'HYPE': 'hyperliquid',
+        'LINK': 'chainlink',
+        'XLM': 'stellar',
+        'BCH': 'bitcoin-cash',
+        'HBAR': 'hedera-hashgraph',
+        'AVAX': 'avalanche-2',
+        'LTC': 'litecoin'
+    }
+    
+    coingecko_id = coingecko_id_map.get(symbol.upper())
+    if not coingecko_id:
+        raise HTTPException(status_code=404, detail=f"Historical data not available for {symbol}")
+    
+    url = f"https://api.coingecko.com/api/v3/coins/{coingecko_id}/market_chart"
+    params = {
+        'vs_currency': 'usd',
+        'days': days,
+        'interval': 'hourly' if days <= 7 else 'daily'
+    }
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params=params) as response:
+            if response.status != 200:
+                raise HTTPException(status_code=response.status, detail="Failed to fetch historical data")
+            
+            data = await response.json()
+            
+            # Convert to more usable format
+            prices = data.get('prices', [])
+            historical_data = []
+            
+            for timestamp, price in prices:
+                historical_data.append({
+                    'timestamp': timestamp,
+                    'date': datetime.fromtimestamp(timestamp / 1000).isoformat(),
+                    'price': round(price, 6)
+                })
+            
+            return historical_data
+
 async def generate_ai_recommendation(crypto: CryptoPrice) -> AIRecommendation:
     """Generate AI-powered investment recommendation"""
     if not OPENAI_API_KEY:

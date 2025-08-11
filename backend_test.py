@@ -23,6 +23,7 @@ class CryptoAPITester:
         self.test_results = {
             'basic_health': {'status': 'pending', 'details': ''},
             'crypto_prices': {'status': 'pending', 'details': ''},
+            'historical_data': {'status': 'pending', 'details': ''},
             'ai_analysis': {'status': 'pending', 'details': ''},
             'individual_recommendation': {'status': 'pending', 'details': ''},
             'recommendation_history': {'status': 'pending', 'details': ''}

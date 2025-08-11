@@ -38,12 +38,12 @@ const PriceChart = ({ symbol, currentPrice }) => {
     const fetchChartData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API}/crypto/${symbol}/history?minutes=60`);
+        const response = await axios.get(`${API}/crypto/${symbol}/history?days=7`);
         const data = response.data.data;
         
-        // Format data for recharts (show every 5 minutes for cleaner display)
-        const formattedData = data.filter((_, index) => index % 5 === 0).map((point, index) => ({
-          time: new Date(point.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        // Format data for recharts (show every 6 hours for cleaner display)
+        const formattedData = data.filter((_, index) => index % 6 === 0).map((point, index) => ({
+          time: new Date(point.date).toLocaleDateString([], { month: 'short', day: 'numeric' }),
           price: point.price,
           index: index
         }));
@@ -96,7 +96,7 @@ const PriceChart = ({ symbol, currentPrice }) => {
               fontSize: '12px'
             }}
             formatter={(value) => [`$${value.toFixed(4)}`, 'Price']}
-            labelFormatter={(label) => `Time: ${label}`}
+            labelFormatter={(label) => `Date: ${label}`}
           />
           <Line 
             type="monotone" 

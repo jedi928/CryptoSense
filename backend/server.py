@@ -335,17 +335,17 @@ async def get_crypto_recommendation(symbol: str):
         raise HTTPException(status_code=500, detail="Failed to generate recommendation")
 
 @api_router.get("/crypto/{symbol}/history")
-async def get_crypto_history(symbol: str, minutes: int = 60):
-    """Get historical price data for a specific cryptocurrency (1 hour by default)"""
+async def get_crypto_history(symbol: str, days: int = 7):
+    """Get historical price data for a specific cryptocurrency (7 days by default)"""
     symbol = symbol.upper()
     if symbol not in TARGET_CRYPTOS:
         raise HTTPException(status_code=404, detail=f"Cryptocurrency {symbol} not supported")
     
     try:
-        historical_data = await fetch_historical_prices(symbol, minutes)
+        historical_data = await fetch_historical_prices(symbol, days)
         return {
             "symbol": symbol,
-            "minutes": minutes,
+            "days": days,
             "data": historical_data
         }
         

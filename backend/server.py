@@ -287,6 +287,16 @@ async def get_market_analysis():
         logger.error(f"Error generating market analysis: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to generate market analysis")
 
+@api_router.get("/crypto/recommendations/history", response_model=List[AIRecommendation])
+async def get_recommendation_history(limit: int = 100):
+    """Get historical AI recommendations"""
+    try:
+        recommendations = await db.recommendations.find().sort("created_at", -1).limit(limit).to_list(limit)
+        return [AIRecommendation(**rec) for rec in recommendations]
+    except Exception as e:
+        logger.error(f"Error fetching recommendation history: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch recommendation history")
+
 @api_router.get("/crypto/{symbol}/recommendation", response_model=AIRecommendation)
 async def get_crypto_recommendation(symbol: str):
     """Get AI recommendation for a specific cryptocurrency"""
@@ -332,16 +342,6 @@ async def get_crypto_history(symbol: str, days: int = 7):
     except Exception as e:
         logger.error(f"Error fetching historical data for {symbol}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch historical data")
-
-@api_router.get("/crypto/recommendations/history", response_model=List[AIRecommendation])
-async def get_recommendation_history(limit: int = 100):
-    """Get historical AI recommendations"""
-    try:
-        recommendations = await db.recommendations.find().sort("created_at", -1).limit(limit).to_list(limit)
-        return [AIRecommendation(**rec) for rec in recommendations]
-    except Exception as e:
-        logger.error(f"Error fetching recommendation history: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch recommendation history")
 
 # Include the router in the main app
 app.include_router(api_router)

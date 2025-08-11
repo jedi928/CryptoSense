@@ -232,7 +232,8 @@ const Home = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-white">CoinSense</h1>
-              <p className="text-gray-300 mt-1">Real-time cryptocurrency prices with on-demand AI investment analysis</p>
+              <p className="text-lg font-semibold text-gray-200 mt-1">Trade Smarter</p>
+              <p className="text-gray-300 mt-1 text-sm">Real-time cryptocurrency prices with on-demand AI investment analysis</p>
             </div>
             <button
               onClick={fetchCryptoPrices}

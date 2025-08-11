@@ -149,26 +149,28 @@ async def fetch_historical_prices(symbol: str, days: int = 7) -> List[Dict]:
     except:
         base_price = 1000
     
-    # Generate realistic mock historical data for 1 hour (minute-by-minute data)
+    # Generate realistic mock historical data for 7 days (hourly data)
     import random
     historical_data = []
     
-    # For 1 hour, generate 60 data points (1 per minute)
-    minutes = 60
+    # For 7 days, generate hourly data points (7 * 24 = 168 points)
+    hours = days * 24
     
-    for i in range(minutes):
-        # Create more significant price variation for interesting charts (-2% to +2%)
-        price_variation = random.uniform(-0.02, 0.02)
-        # Add trending behavior that can create meaningful price movements
-        trend_factor = (i / minutes) * random.uniform(-0.015, 0.015)
-        # Add some volatility spikes occasionally
-        if random.random() < 0.1:  # 10% chance of volatility spike
-            volatility_spike = random.uniform(-0.03, 0.03)
+    for i in range(hours):
+        # Create moderate price variation for 7-day charts (-5% to +5%)
+        price_variation = random.uniform(-0.05, 0.05)
+        # Add gradual trending behavior over the week
+        trend_factor = (i / hours) * random.uniform(-0.1, 0.1)
+        # Smooth the variations to avoid too much noise
+        if i > 0:
+            # Make price somewhat related to previous price for smoother curves
+            prev_price = historical_data[i-1]['price']
+            price_momentum = (prev_price - base_price) / base_price * 0.3
         else:
-            volatility_spike = 0
+            price_momentum = 0
         
-        mock_price = base_price * (1 + price_variation + trend_factor + volatility_spike)
-        timestamp = (datetime.utcnow() - timedelta(minutes=(minutes - i))).timestamp() * 1000
+        mock_price = base_price * (1 + price_variation + trend_factor + price_momentum)
+        timestamp = (datetime.utcnow() - timedelta(hours=(hours - i))).timestamp() * 1000
         
         historical_data.append({
             'timestamp': int(timestamp),

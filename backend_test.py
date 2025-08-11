@@ -148,8 +148,11 @@ class CryptoAPITester:
     async def test_ai_analysis(self):
         """Test OpenAI AI analysis integration"""
         print("🔍 Testing OpenAI AI Analysis Integration...")
+        print("   ⚠️  This test may take 2-3 minutes due to 15 sequential OpenAI API calls...")
         try:
-            async with self.session.get(f"{BACKEND_URL}/crypto/analysis") as response:
+            # Use a longer timeout for AI analysis due to multiple OpenAI calls
+            timeout = aiohttp.ClientTimeout(total=180)  # 3 minutes
+            async with self.session.get(f"{BACKEND_URL}/crypto/analysis", timeout=timeout) as response:
                 if response.status == 200:
                     data = await response.json()
                     
@@ -229,6 +232,13 @@ class CryptoAPITester:
                     print(f"❌ AI Analysis test failed - HTTP {response.status}")
                     return False
                     
+        except asyncio.TimeoutError:
+            self.test_results['ai_analysis'] = {
+                'status': 'fail',
+                'details': "Request timed out after 3 minutes - AI analysis endpoint is too slow for production use"
+            }
+            print("❌ AI Analysis test failed - Request timed out (endpoint too slow)")
+            return False
         except Exception as e:
             self.test_results['ai_analysis'] = {
                 'status': 'fail',

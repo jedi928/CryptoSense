@@ -490,6 +490,9 @@ class CryptoAPITester:
         # Test CoinMarketCap integration
         await self.test_crypto_prices()
         
+        # Test historical chart data
+        await self.test_historical_data()
+        
         # Test AI analysis (this might take longer due to OpenAI calls)
         await self.test_ai_analysis()
         
